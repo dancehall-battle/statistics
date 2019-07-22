@@ -1,0 +1,14 @@
+{
+  "name": "statistics",
+  "version": "0.0.1",
+  "description": "Queries to extract statistics from the knowledge graph.",
+  "main": "index.js",
+  "repository": "https://github.com/dancehall-battle/statistics",
+  "author": "Pieter Heyvaert (https://pieterheyvaert.com)",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "graphql-ld": "^1.0.0",
+    "graphql-ld-comunica": "^1.0.0"
+  }
+}
