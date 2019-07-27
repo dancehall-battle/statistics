@@ -1,6 +1,6 @@
 const {Client} = require('graphql-ld/index');
 const {QueryEngineComunica} = require('graphql-ld-comunica/index');
-const {filterLevel}  = require('./lib/utils');
+const {filterLevel, filterAge}  = require('./lib/utils');
 
 // Define a JSON-LD context
 const context = {
@@ -10,15 +10,14 @@ const context = {
     "end":    { "@id": "http://schema.org/endDate" },
     "wins":    { "@reverse": "https://dancebattle.org/ontology/hasWinner" },
     "level":    { "@id": "https://dancebattle.org/ontology/level" },
+    "age":    { "@id": "https://dancebattle.org/ontology/age" },
     "Dancer": { "@id": "https://dancebattle.org/ontology/Dancer" }
   }
 };
 
 // Create a GraphQL-LD client based on a client-side Comunica engine
 const comunicaConfig = {
-  sources: [
-    { type: "hypermedia", value: "http://localhost:3000/output" },
-  ],
+  sources: require('./sources')
 };
 const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
 
@@ -30,6 +29,7 @@ const query = `
       level @single
       start @single
       end @single
+      age @single
     }
     }
   }`;
@@ -42,6 +42,7 @@ async function main() {
   const data = await executeQuery(query);
   //console.log(data);
   let result = filterLevel(data);
+  result = filterAge(result);
   result = filterDates(result, new Date('2019-04-01'), new Date('2019-06-30'));
   //console.log(result);
 

@@ -17,9 +17,7 @@ const context = {
 
 // Create a GraphQL-LD client based on a client-side Comunica engine
 const comunicaConfig = {
-  sources: [
-    { type: "hypermedia", value: "http://localhost:3000/output" },
-  ],
+  sources: require('./sources')
 };
 const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
 
