@@ -40,7 +40,7 @@ main();
 async function main() {
   // Execute the query
   const data = await executeQuery(query);
-  let result = filterDates(data, new Date('2019-04-01'), new Date('2019-06-30'));
+  let result = filterDates(data, new Date('2019-07-01'), new Date('2019-09-30'));
   //console.log(result);
 
   printAsCSV(countCountries(result));

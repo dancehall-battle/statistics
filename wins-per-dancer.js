@@ -43,7 +43,7 @@ async function main() {
   //console.log(data);
   let result = filterLevel(data);
   result = filterAge(result);
-  result = filterDates(result, new Date('2019-04-01'), new Date('2019-06-30'));
+  result = filterDates(result, new Date('2019-07-01'), new Date('2019-09-30'));
   //console.log(result);
 
   printAsCSV(result);
