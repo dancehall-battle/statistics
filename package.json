@@ -8,6 +8,7 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "fs-extra": "^8.1.0",
     "graphql-ld": "^1.0.0",
     "graphql-ld-comunica": "^1.0.0"
   }

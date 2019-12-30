@@ -1,28 +1,24 @@
 const {Client} = require('graphql-ld/index');
 const {QueryEngineComunica} = require('graphql-ld-comunica/index');
 const {filterLevel, filterAge}  = require('./lib/utils');
+const fs = require('fs-extra');
+const path = require('path');
 
-// Define a JSON-LD context
-const context = {
-  "@context": {
-    "name":  { "@id": "http://schema.org/name" },
-    "start":  { "@id": "http://schema.org/startDate" },
-    "end":    { "@id": "http://schema.org/endDate" },
-    "wins":    { "@reverse": "https://dancebattle.org/ontology/hasWinner" },
-    "level":    { "@id": "https://dancebattle.org/ontology/level" },
-    "age":    { "@id": "https://dancebattle.org/ontology/age" },
-    "Dancer": { "@id": "https://dancebattle.org/ontology/Dancer" }
-  }
-};
+main();
 
-// Create a GraphQL-LD client based on a client-side Comunica engine
-const comunicaConfig = {
-  sources: require('./sources')
-};
-const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
+async function main() {
+  const context = {
+    "@context": await fs.readJson(path.resolve(__dirname, './context.json'))
+  };
+
+  // Create a GraphQL-LD client based on a client-side Comunica engine
+  const comunicaConfig = {
+    sources: require('./sources')
+  };
+  const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
 
 // Define a query
-const query = `
+  const query = `
   query { ... on Dancer {
     name @single
     wins {
@@ -34,25 +30,15 @@ const query = `
     }
   }`;
 
-
-main();
-
-async function main() {
   // Execute the query
-  const data = await executeQuery(query);
+  const {data} = await client.query({ query });
   //console.log(data);
   let result = filterLevel(data);
   result = filterAge(result);
-  result = filterDates(result, new Date('2019-07-01'), new Date('2019-09-30'));
+  result = filterDates(result, new Date('2019-10-01'), new Date('2019-12-31'));
   //console.log(result);
 
   printAsCSV(result);
-}
-
-async function executeQuery(query){
-  const {data} = await client.query({ query });
-
-  return data;
 }
 
 function filterDates(dancers, startDate, endDate) {

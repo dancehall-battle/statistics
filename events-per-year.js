@@ -1,36 +1,32 @@
 const {Client} = require('graphql-ld/index');
 const {QueryEngineComunica} = require('graphql-ld-comunica/index');
-
-// Define a JSON-LD context
-const context = {
-  "@context": {
-    "type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    "start":  { "@id": "http://schema.org/startDate" },
-    "end":    { "@id": "http://schema.org/endDate" },
-    "EVENT": { "@id": "https://dancebattle.org/ontology/DanceEvent" }
-  }
-};
-
-// Create a GraphQL-LD client based on a client-side Comunica engine
-const comunicaConfig = {
-  sources: require('./sources')
-};
-const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
-
-// Define a query
-const query = `
-  query {
-    id @single
-    type(_:EVENT)
-    start @single
-    end @single
-  }`;
+const fs = require('fs-extra');
+const path = require('path');
 
 main();
 
 const years = {};
 
 async function main() {
+  const context = {
+    "@context": await fs.readJson(path.resolve(__dirname, './context.json'))
+  };
+
+  // Create a GraphQL-LD client based on a client-side Comunica engine
+  const comunicaConfig = {
+    sources: require('./sources')
+  };
+  const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
+
+  // Define a query
+  const query = `
+  query {
+    id @single
+    type(_:Event)
+    start @single
+    end @single
+  }`;
+
   // Execute the query
   const events = (await client.query({ query })).data;
 

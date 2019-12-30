@@ -1,60 +1,44 @@
 const {Client} = require('graphql-ld/index');
 const {QueryEngineComunica} = require('graphql-ld-comunica/index');
-const {filterLevel, filterAge}  = require('./lib/utils');
-
-// Define a JSON-LD context
-const context = {
-  "@context": {
-    "name":  { "@id": "http://schema.org/name" },
-    "start":  { "@id": "http://schema.org/startDate" },
-    "end":    { "@id": "http://schema.org/endDate" },
-    "wins":    { "@reverse": "https://dancebattle.org/ontology/hasWinner" },
-    "level":    { "@id": "https://dancebattle.org/ontology/level" },
-    "age":    { "@id": "https://dancebattle.org/ontology/age" },
-    "hasBattle":    { "@id": "https://dancebattle.org/ontology/hasBattle" },
-    "type":    { "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" },
-    "DanceEvent": { "@id": "https://dancebattle.org/ontology/DanceEvent" }
-  }
-};
-
-// Create a GraphQL-LD client based on a client-side Comunica engine
-const comunicaConfig = {
-  sources: require('./sources')
-};
-const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
-
-// Define a query
-const queryAllEvents = `
-  query {
-    id @single
-    name @single
-    type(_:DanceEvent)
-  }`;
-
-const queryEventsWithBattle = `
-  query {
-    id @single
-    type(_:DanceEvent)
-    hasBattle
-  }`;
+const fs = require('fs-extra');
+const path = require('path');
 
 main();
 
 async function main() {
+  const context = {
+    "@context": await fs.readJson(path.resolve(__dirname, './context.json'))
+  };
+
+  // Create a GraphQL-LD client based on a client-side Comunica engine
+  const comunicaConfig = {
+    sources: require('./sources')
+  };
+  const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
+
+  // Define a query
+  const queryAllEvents = `
+  query {
+    id @single
+    name @single
+    type(_:Event)
+  }`;
+
+  const queryEventsWithBattle = `
+  query {
+    id @single
+    type(_:Event)
+    hasBattle
+  }`;
+
   // Execute the query
-  const data = await executeQuery(queryAllEvents);
-  const data2 = await executeQuery(queryEventsWithBattle);
+  const {data} = await client.query({ query: queryAllEvents });
+  const data2 = (await client.query({ query: queryEventsWithBattle })).data;
 
   const eventsWithBattleIDs = data2.map(d => d.id);
   const filtered = data.filter(event => eventsWithBattleIDs.indexOf(event.id) === -1);
 
   printAsCSV(filtered);
-}
-
-async function executeQuery(query){
-  const {data} = await client.query({ query });
-
-  return data;
 }
 
 function printAsCSV(data) {

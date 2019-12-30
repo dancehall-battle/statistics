@@ -1,28 +1,21 @@
 const {Client} = require('graphql-ld/index');
 const {QueryEngineComunica} = require('graphql-ld-comunica/index');
+const fs = require('fs-extra');
+const path = require('path');
 
-// Define a JSON-LD context
-const context = {
-  "@context": {
-    "label":  { "@id": "http://www.w3.org/2000/01/rdf-schema#label" },
-    "name":  { "@id": "http://schema.org/name" },
-    "start":  { "@id": "http://schema.org/startDate" },
-    "end":    { "@id": "http://schema.org/endDate" },
-    "location":    { "@id": "http://schema.org/location" },
-    "hasWinner":    { "@id": "https://dancebattle.org/ontology/hasWinner" },
-    "hasBattle":    {  "@id": "https://dancebattle.org/ontology/hasBattle" },
-    "Event": { "@id": "https://dancebattle.org/ontology/DanceEvent" }
-  }
-};
+main();
 
-// Create a GraphQL-LD client based on a client-side Comunica engine
-const comunicaConfig = {
-  sources: require('./sources')
-};
-const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
+async function main() {
+  const context = {
+    "@context": await fs.readJson(path.resolve(__dirname, './context.json'))
+  };
 
-// Define a query
-const query = `
+  // Create a GraphQL-LD client based on a client-side Comunica engine
+  const comunicaConfig = {
+    sources: require('./sources')
+  };
+  const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
+  const query = `
   query { ... on Event {
     location @single
     name @single
@@ -34,22 +27,12 @@ const query = `
     }
   }`;
 
-
-main();
-
-async function main() {
   // Execute the query
-  const data = await executeQuery(query);
-  let result = filterDates(data, new Date('2019-07-01'), new Date('2019-09-30'));
+  const {data} = await client.query({ query });
+  let result = filterDates(data, new Date('2019-10-30'), new Date('2019-12-31'));
   //console.log(result);
 
   printAsCSV(countCountries(result));
-}
-
-async function executeQuery(query){
-  const {data} = await client.query({ query });
-
-  return data;
 }
 
 function filterDates(events, startDate, endDate) {
