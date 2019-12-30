@@ -16,7 +16,9 @@ async function main() {
   };
   const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
   const query = `
-  query { ... on Event {
+  query {
+    id @single
+    type(_:Event)
     location @single
     name @single
     hasBattle {
@@ -24,12 +26,11 @@ async function main() {
       end @single
       hasWinner #only select battles for which we know the winner
     }
-    }
   }`;
 
   // Execute the query
   const {data} = await client.query({ query });
-  let result = filterDates(data, new Date('2019-10-30'), new Date('2019-12-31'));
+  let result = filterDates(data, new Date('2019-10-01'), new Date('2019-12-31'));
   //console.log(result);
 
   printAsCSV(countCountries(result));
