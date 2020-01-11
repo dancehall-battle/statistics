@@ -1,0 +1,21 @@
+{
+  "schema": "http://schema.org/",
+  "dhb": "https://dancehallbattle.org/ontology/",
+  "label":  "http://www.w3.org/2000/01/rdf-schema#label",
+  "name":  "schema:name",
+  "start":  "schema:startDate",
+  "end":    "schema:endDate",
+  "location": "schema:location",
+  "hasWinner":    "dhb:hasWinner",
+  "wins":    { "@reverse": "dhb:hasWinner" },
+  "level":    "dhb:level",
+  "age":    "dhb:age",
+  "hasBattle":    "dhb:hasBattle",
+  "atEvent":    {  "@reverse": "dhb:hasBattle" },
+  "participants": "dhb:amountOfParticipants",
+  "country": "dhb:representsCountry",
+  "type":    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+  "DanceBattle": "dhb:DanceBattle",
+  "DanceEvent": "dhb:DanceEvent",
+  "Dancer": "dhb:Dancer"
+}

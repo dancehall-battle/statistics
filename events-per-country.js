@@ -1,29 +1,8 @@
-const {Client} = require('graphql-ld/index');
-const {QueryEngineComunica} = require('graphql-ld-comunica/index');
-
-// Define a JSON-LD context
-const context = {
-  "@context": {
-    "label":  { "@id": "http://www.w3.org/2000/01/rdf-schema#label" },
-    "name":  { "@id": "http://schema.org/name" },
-    "start":  { "@id": "http://schema.org/startDate" },
-    "end":    { "@id": "http://schema.org/endDate" },
-    "location":    { "@id": "http://schema.org/location" },
-    "hasWinner":    { "@id": "https://dancebattle.org/ontology/hasWinner" },
-    "hasBattle":    {  "@id": "https://dancebattle.org/ontology/hasBattle" },
-    "Event": { "@id": "https://dancebattle.org/ontology/DanceEvent" }
-  }
-};
-
-// Create a GraphQL-LD client based on a client-side Comunica engine
-const comunicaConfig = {
-  sources: require('./sources')
-};
-const client = new Client({ context, queryEngine: new QueryEngineComunica(comunicaConfig) });
+const {getClient} = require('./lib/utils');
 
 // Define a query
 const query = `
-  query { ... on Event {
+  query { ... on DanceEvent {
     location @single
     name @single
     hasBattle {
@@ -34,22 +13,15 @@ const query = `
     }
   }`;
 
-
 main();
 
 async function main() {
-  // Execute the query
-  const data = await executeQuery(query);
+  const client = await getClient();
+  const data = (await client.query({ query })).data;
   let result = filterDates(data, new Date('2019-07-01'), new Date('2019-09-30'));
   //console.log(result);
 
   printAsCSV(countCountries(result));
-}
-
-async function executeQuery(query){
-  const {data} = await client.query({ query });
-
-  return data;
 }
 
 function filterDates(events, startDate, endDate) {
