@@ -11,3 +11,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Release v1.0.0
+
+[1.0.0]: https://github.com/dancehall-battle/statistics/releases/tag/v1.0.0
