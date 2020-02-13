@@ -5,6 +5,7 @@ const queryAllEvents = `
   query {
     id @single
     name @single
+    end @single
     type(_:DanceEvent)
   }`;
 
@@ -19,7 +20,8 @@ main();
 
 async function main() {
   const client = await getClient();
-  const data = (await client.query({ query: queryAllEvents })).data;
+  const today = new Date();
+  const data = (await client.query({ query: queryAllEvents })).data.filter(event => new Date(event.end) < today);
   const data2 = (await client.query({ query: queryEventsWithBattle })).data;
 
   const eventsWithBattleIDs = data2.map(d => d.id);
@@ -29,9 +31,9 @@ async function main() {
 }
 
 function printAsCSV(data) {
-  console.log(`id,name`);
+  console.log(`id,name,end date`);
 
   data.forEach(event => {
-    console.log(`"${event.id}","${event.name}"`);
+    console.log(`"${event.id}","${event.name}","${event.end}"`);
   });
 }

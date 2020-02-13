@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Added
+- Add option to filter out upcoming events/battles ([see issue 9](https://github.com/dancehall-battle/statistics/issues/9))
+
 ## [1.0.0] - 2020-01-13
 
 ### Added
